@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Descriptor de Rutas</title>
+    <link rel="stylesheet"
+  href="/leaflet.css">
+    <link rel="stylesheet" href="LRM/dist/leaflet.routing.machine.min.css">
+    <style>
+      #map {
+        height: 100%;
+        width: 100%;
+        position: absolute;
+      }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script src="/leaflet.js"></script>
+  <script src="/LRM/dist/leaflet-routing-machine.js"></script>
+  <script src="/LRM/dist/leaflet-routing-machine.css"></script>
+  <script src="/lrm-mapzen/lrm-mapzen.js"></script>
+  <script src="/Control.Geocoder.js"></script>
+  <script>
+    var map = L.map('map');
+    ///var layer = Tangram.leafletLayer({
+      ///scene: 'https://raw.githubusercontent.com/tangrams/cinnabar-style/gh-pages/cinnabar-style.yaml',
+      ///attribution: '<a href="https://mapzen.com/tangram" target="_blank">Tangram</a> | <a href="http://www.openstreetmap.org/about" target="_blank">&copy; OSM contributors | <a href="https://mapzen.com/" target="_blank">Mapzen</a>',
+///});
+L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+///layer.addTo(map);
+//map.setView([19.3212,-99.1820], 15);
+L.Routing.control({
+  waypoints: [
+    L.latLng(19.3212,-99.1820),
+    L.latLng(19.3553,-99.1342)
+  ],
+  lineOptions: {
+        styles: [ {color: 'white',opacity: 1, weight: 6},
+                {color: '#2676C6', opacity: 0.8, weight: 3}
+      ]},
+  ///router: L.Routing.control///mapzen('mapzen-APj1vwQ', {costing:'auto'}),
+      ///formatter: new L.Routing.mapzenFormatter(),
+      ///summaryTemplate:'<div class="start">{name}</div><div class="info {costing}">{distance}, {time}</div>',
+      routeWhileDragging: true,///false
+      geocoder: L.Control.Geocoder.nominatim()
+}).addTo(map);
+  </script>
+
+///
+///Funcionalidad para ruta multimodal
+////
+L.Routing.control({
+  router: L.Routing.mapzen('mapzen-xxxxxx', {
+    // you need to pass mapzenLine as routeLine to router to see subroutes of transit routing.
+    // you can skip routeLine if you don't want to use subroutes.
+    routeLine: function (route, options) { return L.Routing.mapzenLine(route, options); },
+    costing: "multimodal",
+    date_time: {
+      type: 1,
+      value: "2016-05-10T08:00"
+    }
+  }),
+  formatter: new L.Routing.mapzenFormatter(),
+}).addTo(map);
+///
+///Termina Ruta multimodal
+///
+///Inicia funciionalidad para puntos intermedios
+///(Emparejamiento)
+///
+
+  <script>
+  function createButton(label, container) {
+    var btn = L.DomUtil.create('button', '+', container);
+    btn.setAttribute('type', 'button');
+    btn.innerHTML = label;
+    return btn;
+}
+
+map.on('click', function(e) {
+    var container = L.DomUtil.create('div'),
+        startBtn = createButton('Start from this location', container),
+        destBtn = createButton('Go to this location', container);
+
+    L.popup()
+        .setContent(container)
+        .setLatLng(e.latlng)
+        .openOn(map);
+});
+L.DomEvent.on(destBtn, 'click', function() {
+       control.spliceWaypoints(control.getWaypoints().length - 1, 1, e.latlng);
+       map1.closePopup();
+   });
+</script>
+</body>
+</html>
